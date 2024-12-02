@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="content"></div>
+    <input type="file" name="" multiple>
+
+    <script>
+        const input_file = document.querySelector("input");
+        const content = document.querySelector(".content");
+
+        input_file.addEventListener("change", e => {
+            for (let i = 0; i < e.currentTarget.files.length; i++) {
+                const node = document.createElement("img");
+                // 幫檔案創建 url
+                const src = URL.createObjectURL(e.target.files[i]);
+                console.log(src);
+                node.src = src;
+                content.append(node);
+            }
+        });
+    </script>
+</body>
+
+</html>

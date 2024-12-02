@@ -1,0 +1,24 @@
+.logo{
+    height: 56px;
+}
+.cart-btn{
+    --width: 36px;
+    display: flex;
+    width: var(--width);
+    height: var(--width);
+    justify-content: center;
+    align-items: center;
+    font-size: var(--width);
+    text-decoration: none;
+    .link-count{
+        --width: 24px;
+        width: var(--width);
+        height: var(--width);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: .75rem;
+        transform: translateX(80%) translateY(-80%);
+    }
+}
