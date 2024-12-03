@@ -120,7 +120,7 @@ $areas = $resultCate->fetch_all(MYSQLI_ASSOC);
                 <a class="btn btn=primary " href="band.php"><i class="fa-solid fa-circle-left fa-fw"></i></a>
               <?php endif ?>
               <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
-              <li class="breadcrumb-item text-sm text-dark active" aria-current="page">band</li>
+              <li class="breadcrumb-item text-sm text-dark active" aria-current="page">練團室租借管理</li>
             </div>
           </ol>
         </nav>
@@ -246,7 +246,7 @@ $areas = $resultCate->fetch_all(MYSQLI_ASSOC);
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="bg-dark shadow-dark border-radius-lg pt-3 pb-2 d-flex justify-content-between">
                 <div class="px-2">
-                  <h4 class="text-white fw-normal ps-3 fs-4">練團室租借</h4>
+                  <h4 class="text-white fw-normal ps-3 fs-4">練團室租借管理</h4>
                   <h6 class=" text-capitalize ps-3 fw-normal text-secondary">共計 <?= $total_count ?> 使用者</h6>
                 </div>
                 <div class="py-2">

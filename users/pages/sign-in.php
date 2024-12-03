@@ -1,3 +1,38 @@
+<?php
+session_start();
+
+// 設定最大錯誤次數
+$max_attempts = 3;
+
+// 初始化錯誤次數
+if (!isset($_SESSION['login_attempts'])) {
+  $_SESSION['login_attempts'] = 0;
+}
+
+// 處理登入請求
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $username = $_POST['username'];
+  $password = $_POST['password'];
+
+  // 假設這裡有一個函數來驗證使用者憑證
+  if (validate_credentials($username, $password)) {
+    // 登入成功，重置錯誤次數
+    $_SESSION['login_attempts'] = 0;
+    header("Location: dashboard.php");
+    exit;
+  } else {
+    // 登入失敗，增加錯誤次數
+    $_SESSION['login_attempts'] += 1;
+  }
+}
+
+// 驗證使用者憑證的函數（僅作為範例）
+function validate_credentials($username, $password)
+{
+  // 這裡應該有實際的驗證邏輯，例如查詢資料庫
+  return $username === 'admin' && $password === 'password';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -70,7 +105,7 @@
               <div class="card-body">
                 <?php if (isset($_GET["error"])): ?>
                   <div class="alert alert-danger" role="alert">
-                    <?= htmlspecialchars($_GET["error"]) ?>
+                    <?php echo htmlspecialchars($_GET['error']); ?>
                   </div>
                   <script>
                     // 清除 URL 中的查詢參數

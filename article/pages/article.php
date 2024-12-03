@@ -10,11 +10,10 @@ $whereClause = "WHERE article.is_deleted = 0"; // 加入基礎條件
 // 搜尋條件
 if (isset($_GET["search"])) {
   $search = $conn->real_escape_string($_GET["search"]);
-  $whereClause .= " AND (article.content LIKE '%$search%' 
+  $whereClause .= " AND (category.name LIKE '%$search%' 
                           OR article.title LIKE '%$search%' 
                           OR article.author LIKE '%$search%' 
-                          OR article.created_at LIKE '%$search%' 
-                          OR category.name LIKE '%$search%')";
+                          OR article.created_at LIKE '%$search%' )";
 }
 
 // 類別篩選條件

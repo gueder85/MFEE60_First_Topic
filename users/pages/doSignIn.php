@@ -7,6 +7,14 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 
 require_once("../../db_connect.php");
 
+// 設定最大錯誤次數
+$max_attempts = 3;
+
+// 初始化錯誤次數
+if (!isset($_SESSION['login_attempts'])) {
+  $_SESSION['login_attempts'] = 0;
+}
+
 $account = $_POST["account"];
 $password = $_POST["password"];
 
@@ -37,17 +45,21 @@ if ($result === false) {
   exit();
 }
 
-
 if ($result->num_rows > 0) {
-  $user = $result->fetch_assoc();
-  $_SESSION["user_id"] = $user["id"];
-  $_SESSION["user_name"] = $user["name"];
+  // 登入成功，重置錯誤次數
+  $_SESSION['login_attempts'] = 0;
   header("Location: users.php");
   exit();
 } else {
-  $error = "帳號或密碼錯誤";
+  // 登入失敗，增加錯誤次數
+  $_SESSION['login_attempts'] += 1;
+
+  if ($_SESSION['login_attempts'] >= $max_attempts) {
+    $error = "輸入錯誤次數過多，請稍後再試。";
+  } else {
+    $error = "帳號或密碼錯誤";
+  }
+
   header("Location: sign-in.php?error=" . urlencode($error));
   exit();
 }
-
-$conn->close();

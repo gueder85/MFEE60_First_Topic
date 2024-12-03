@@ -92,7 +92,9 @@ class Activity
             $sql = "$sql $whereClause";
 
             // 加上 分頁
-            $sql = "$sql LIMIT $start_item, $per_page";
+            if(!empty($start_item)) {
+                $sql = "$sql LIMIT $start_item, $per_page";
+            }
         }
 
         $result = $this->conn->query($sql);

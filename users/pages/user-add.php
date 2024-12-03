@@ -85,7 +85,7 @@
               </div>
             </div>
             <div class="card-body">
-              <form action="doCreateUser.php" method="POST">
+              <form action="doCreateUser.php" method="POST" onsubmit="return validateForm()">
                 <div class="mb-3 w-25">
                   <label for="name" class="form-label">姓名</label>
                   <input type="text" class="form-control" id="name" name="name" required>
@@ -97,6 +97,11 @@
                 <div class="mb-3 w-25">
                   <label for="account" class="form-label">密碼</label>
                   <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3 w-25">
+                  <label for="confirm_password" class="form-label">請再輸入密碼</label>
+                  <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                  <div id="password_error" class="text-danger mt-2" style="display: none;">兩次輸入的密碼不一致</div>
                 </div>
                 <div class="mb-3 w-25">
                   <label for="gender" class="form-label">性別</label>
@@ -160,6 +165,22 @@
       </div>
     </div>
   </main>
+  <script>
+    function validateForm() {
+      var password = document.getElementById("password").value;
+      var confirmPassword = document.getElementById("confirm_password").value;
+      var passwordError = document.getElementById("password_error");
+
+      if (password !== confirmPassword) {
+        passwordError.style.display = "block";
+        return false;
+      } else {
+        passwordError.style.display = "none";
+      }
+      return true;
+    }
+  </script>
+
 </body>
 
 </html>

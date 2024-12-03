@@ -8,7 +8,8 @@ if (!isset($_GET["id"])) {
 
 $id = $_GET["id"];
 $showModal = false; // 用於控制顯示圖片更換成功的 Modal
-$showSuccessModal = false;  // 控制顯示儲存成功的 Modal
+$showSuccessModal = isset($_GET['save_success']);  // 控制顯示儲存成功的 Modal
+$showDeleteSuccessModal = isset($_GET['delete_success']); // 控制顯示刪除成功的 Modal
 
 // 獲取使用者資料的函數
 function getUserData($conn, $id)
@@ -21,7 +22,8 @@ function getUserData($conn, $id)
   $result = $conn->query($sql);
 
   if ($result->num_rows == 0) {
-    echo "找不到使用者";
+    // echo "找不到使用者";
+    header("Location: users.php");
     exit;
   }
 
@@ -30,13 +32,12 @@ function getUserData($conn, $id)
 
 // 檢查表單是否提交
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (isset($_POST["delete"])) {
+  if (isset($_POST["confirm_delete"])) {
     // 刪除使用者
+    $id = $_POST["id"];
     $sql = "UPDATE users SET is_deleted=1 WHERE id=$id";
     if ($conn->query($sql) === TRUE) {
-      echo "刪除成功";
-      // 重定向到使用者列表頁面
-      header("Location: users.php");
+      header("Location: user-edit.php?id=$id&delete_success=1");
       exit;
     } else {
       echo "刪除失敗: " . $conn->error;
@@ -44,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } else {
     // 檢查是否有文件上傳
     if (isset($_FILES["profile_image"]) && $_FILES["profile_image"]["error"] == 0) {
+      // 處理文件上傳
       $target_dir = "../uploads/";
       $target_file = $target_dir . basename($_FILES["profile_image"]["name"]);
       $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -88,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $sql = "UPDATE users SET name='$name', user_level_id='$user_level_id', city='$city', email='$email', phone='$phone' WHERE id=$id";
     if ($conn->query($sql) === TRUE) {
-      $showSuccessModal = true; // 設置顯示儲存成功的 Modal
+      header("Location: user-edit.php?id=$id&save_success=1");
+      exit;
     } else {
       echo "更新失敗: " . $conn->error;
     }
@@ -162,7 +165,7 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body class="g-sidenav-show bg-gray-100">
-  <?php include_once("sidebar.php") ?>
+  <?php include_once("../../sidebar.php") ?>
 
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
     <div class="container-fluid py-4">
@@ -175,6 +178,23 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
               </div>
             </div>
             <div class="card-body">
+              <!-- <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog model-sm">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalLabel">確認刪除</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      確認刪除該帳號
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">取消</button>
+                      <a class="btn btn-dark text-white" href="userDoDelete.php?id=<?= $row["id"] ?>">確認</a>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
               <form action="user-edit.php?id=<?= $id ?>" method="post" enctype="multipart/form-data">
                 <div class="row">
                   <div class="col-lg-5 col-md-6 mb-3">
@@ -185,14 +205,13 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
                       <!-- 預設圖片 -->
                       <img id="profile_image_preview" class="img-thumbnail mt-2 w-75 d-block" src="../images/icon.jpg">
                     <?php endif; ?>
-                    <button type="button" class="btn btn-light text-dark mt-4" onclick="showImageInput()">變更使用者圖片</button>
+                    <button type="button" class="btn btn-light text-dark mt-4" id="change_image_button" onclick="showImageInput()">變更使用者圖片</button>
                     <input type="file" class="form-control my-2 w-75" id="profile_image_input" name="profile_image" onchange="previewImage(event)" style="display: none;">
-                    <!-- <button type="submit" class="btn btn-dark mt-3" id="change_image_button" style="display: none;">更換</button> -->
                     <div class="d-flex">
                       <button type="submit" class="btn btn-dark mt-4">儲存</button>
                       <a class="text-white" href="users.php?id=<?= $row["id"] ?>"></a>
                       <button type="button" class="btn btn-secondary mt-4 ms-2"><a class="text-white" href="users.php">取消</a></button>
-                      <button type="submit" name="delete" class="btn btn-danger mt-4 ms-7">刪除</button>
+                      <button type="button" class="btn btn-danger mt-4 ms-7" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">刪除</button>
                     </div>
                   </div>
                   <div class="col-lg-7 col-md-6">
@@ -208,7 +227,6 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
                       <label for="name" class="form-label">姓名</label>
                       <input type="text" class="form-control" id="name" name="name" value="<?= $row["name"] ?>">
                     </div>
-
                     <div class="form-group w-50">
                       <label for="user_level_id">會員等級</label>
                       <select class="form-control" id="user_level_id" name="user_level_id" required>
@@ -234,7 +252,7 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
                       </select>
                     </div>
                   </div>
-
+                </div>
               </form>
             </div>
           </div>
@@ -243,43 +261,78 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
     </div>
   </main>
 
-  <!-- 使用者更換圖片成功 Modal -->
-  <!-- <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog w-25 h-25">
-      <div class="modal-content">
-        <div class="modal-body">
-          <div class="fw-normal text-dark">圖片更換成功！</div>
-        </div>
-        <div class="modal-body text-end">
-          <button type="button" class="btn btn-secondary mt-1" data-bs-dismiss="modal">關閉</button>
+
+  <!-- 儲存成功 Modal -->
+  <?php if ($showSuccessModal): ?>
+    <div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-labelledby="saveSuccessModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="saveSuccessModalLabel">儲存成功</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            使用者資料已成功儲存！
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">確定</button>
+          </div>
         </div>
       </div>
     </div>
-  </div> -->
+  <?php endif; ?>
 
-  <!-- 儲存成功 Modal -->
-  <div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-labelledby="saveSuccessModalLabel" aria-hidden="true">
-    <div class="modal-dialog w-25 h-25">
+  <!-- 刪除前詢問 Modal -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-body">
-          <div class="fw-normal text-dark">修改儲存成功！</div>
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmModalLabel">確認刪除</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body text-end">
-          <button type="button" class="btn btn-secondary mt-1" data-bs-dismiss="modal">關閉</button>
+        <div class="modal-body">
+          請確認是否刪除此使用者？
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <form method="post" style="display: inline;">
+            <input type="hidden" name="id" value="<?php echo $id; ?>">
+            <input type="hidden" name="is_deleted" value="1">
+            <button type="submit" name="confirm_delete" class="btn btn-danger">刪除</button>
+          </form>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 刪除成功 Modal -->
+  <!-- <?php if ($showDeleteSuccessModal): ?>
+    <div class="modal fade" id="deleteSuccessModal" tabindex="-1" aria-labelledby="deleteSuccessModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteSuccessModalLabel">刪除成功</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            使用者已成功刪除！
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="redirectToUsers()">確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?> -->
+
+
   <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
   <script>
     function showImageInput() {
       document.getElementById('profile_image_input').style.display = 'block';
-      document.getElementById('change_image_button').style.display = 'block';
+      document.getElementById('change_image_button').style.display = 'none';
     }
 
     function previewImage(event) {
@@ -292,16 +345,24 @@ $cities = $result->fetch_all(MYSQLI_ASSOC);
       reader.readAsDataURL(event.target.files[0]);
     }
 
-    // <?php if ($showModal): ?>
-    //   var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-    //   successModal.show();
-    // <?php endif; ?>
-
     <?php if ($showSuccessModal): ?>
       var saveSuccessModal = new bootstrap.Modal(document.getElementById('saveSuccessModal'));
       saveSuccessModal.show();
     <?php endif; ?>
+
+    <?php if ($showDeleteSuccessModal): ?>
+      var deleteSuccessModal = new bootstrap.Modal(document.getElementById('deleteSuccessModal'));
+      deleteSuccessModal.show();
+    <?php endif; ?>
+
+    function redirectToUsers() {
+      window.location.href = 'users.php';
+    }
   </script>
 </body>
 
 </html>
+
+<?php
+$conn->close();
+?>
