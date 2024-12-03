@@ -77,7 +77,7 @@ $total_page = ceil($couponAllCount / $per_page);
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> -->
   <!-- Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
   <!-- CSS Files -->
@@ -109,7 +109,7 @@ $total_page = ceil($couponAllCount / $per_page);
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-            <li class="breadcrumb-item text-lg text-dark active" aria-current="page">會員管理</li>
+            <li class="breadcrumb-item text-lg text-dark active" aria-current="page">優惠券管理</li>
           </ol>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
@@ -190,6 +190,9 @@ $total_page = ceil($couponAllCount / $per_page);
                           <a href="coupons.php?p=<?= $p ?>&order=id&direction=<?= $new_direction ?>" class="text-secondary">Type</a>
                         </th>
                         <th class="text-secondary text-center text-sm fw-bold opacity-7">
+                          <a href="coupons.php?p=<?= $p ?>&order=id&direction=<?= $new_direction ?>" class="text-secondary">Discount Type</a>
+                        </th>
+                        <th class="text-secondary text-center text-sm fw-bold opacity-7">
                           <a href="coupons.php?p=<?= $p ?>&order=id&direction=<?= $new_direction ?>" class="text-secondary">Discount</a>
                         </th>
                         <th class="text-secondary text-center text-sm fw-bold opacity-7">
@@ -211,6 +214,10 @@ $total_page = ceil($couponAllCount / $per_page);
 
                           <td class="text-center w-10 py-3">
                             <p class="text-md font-weight-bold mb-0"><?= $row["type"] ?></p>
+                          </td>
+
+                          <td class="text-center w-10 py-3">
+                            <p class="text-md font-weight-bold mb-0"><?= $row["discount_type"] ?></p>
                           </td>
 
                           <td class="text-center w-10 py-3">

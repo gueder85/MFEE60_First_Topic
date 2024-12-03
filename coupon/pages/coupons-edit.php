@@ -77,12 +77,15 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <title>修改優惠券</title>
   <style>
     #coupons .active {
       font-weight: 900;
       color: aliceblue;
-      background-color: rgb(246, 95, 35);
+      /* background-color: rgb(246, 95, 35); */
+      background-color: #eee;
+
     }
 
     #coupons .form-select {
@@ -99,9 +102,34 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     </aside>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
       <div class="row w-50" id="coupons">
-        <div class="ms-3 d-flex justify-content-between">
+        <div class=" d-flex justify-content-between">
           <a class="btn btn-dark" href="coupons.php"><i class="fa-solid fa-right-to-bracket"></i></a>
-          <a class="btn btn-dark" href="doDeleted.php?id=<?= $_GET["id"] ?>">刪除</a>
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            刪除
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">刪除資料</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  確定刪除?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                  <button type="button" class="btn btn-danger"> <a class="btn-danger" href="doDeleted.php?id=<?= $_GET["id"] ?>">刪除</a>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal End -->
+
         </div>
         <div>
           <h3 class="mb-0 h4 font-weight-bolder">修改優惠券</h3>
@@ -115,50 +143,49 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <?php foreach ($categories as $category): ?>
               <ul class="nav nav-underline mb-3 ">
                 <li class="nav-item ms-2 me-2 p-1">
-                  <a href="coupons-edit.php?category=<?= $category["id"] ?>&id=<?= $id ?>" class="nav-link p-2 <?php if (isset($_GET["category"]) && $_GET["category"] == $category["id"]) echo "active" ?>" id="type_select"><?= $category["category"] ?></a>
+                  <a href="coupons-edit.php?category=<?= $category["id"] ?>&id=<?= $id ?>" class="text-dark nav-link p-2 <?php if (isset($_GET["category"]) && $_GET["category"] == $category["id"]) echo "active" ?>" id="type_select"><?= $category["category"] ?></a>
 
                 </li>
               </ul>
             <?php endforeach; ?>
           </div>
-          <div class="mb-4 ">
-            <label for="" class="form-label">優惠券名稱</label>
-            <input type="text" class="form-control" name="name">
-          </div>
           <?php if (isset($_GET["category"])): ?>
             <div class="mb-4 ">
+              <label for="" class="form-label">優惠券名稱</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="mb-4 ">
               <label for="" class="form-label">折扣</label>
-              <input type="hidden" name="discount_type" id="discount_type" value="<?= $select["id"] ?>">
+              <input type="hidden" name="discount_type" id="discount_type" value="<?= $selectsArr[$select["id"]] ?>">
               <!-- 新增隱藏欄位 -->
               <?php if (isset($category["id"]) && ($category["id"] == 3)): ?>
-                <select class="form-select mb-2" aria-label="Default select example" id="discount_select">
-                  <option selected>請選擇</option>
+                <select class="form-select mb-2" aria-label="Default select example" id="discount_select" onchange="updateDiscountType()">
+                  <!-- <option selected>請選擇</option> -->
                   <?php foreach ($selects as $select): ?>
                     <option value="<?= $selectsArr[$select["id"]] ?>"><?= $selectsArr[$select["id"]] ?></option>
                   <?php endforeach; ?>
                 </select>
               <?php else: ?>
-
               <?php endif; ?>
 
-              <input type="text" class="form-control" name="discount" id="discount_text">
+              <input type="text" class="form-control" name="discount" id="discount_text" required>
             </div>
 
             <div class="mb-4">
               <label for="" class="form-label">優惠券可使用期間</label>
 
-              <input type="date" id="time" name="str-time">~
-              <input type="date" id="time" name="end-time">
+              <input type="date" id="time" name="str-time" required>~
+              <input type="date" id="time" name="end-time" required>
               <input type="hidden" name="id" value="<?= $id ?>">
-              <button type="submit" class="btn btn-dark mb-2" id="button1" onclick="sendData()">送出</button>
+              <button type="submit" class="btn btn-dark mb-2" id="button1">送出</button>
               <button type="submit" class="btn btn-dark mb-2" id="button2">確認</button>
 
             </div>
+          <?php else: ?>
 
+          <?php endif; ?>
         </form>
-      <?php else: ?>
 
-      <?php endif; ?>
       </div>
       <div class="row">
 
@@ -177,6 +204,8 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <tr>
                       <th class="text-center text-uppercase text-secondary  opacity-7">Name</th>
                       <th class="text-center text-uppercase text-secondary font-weight-bolder opacity-7 ps-2">Type</th>
+                      <th class="text-center text-uppercase text-secondary  opacity-7">discount Type</th>
+                      <th class="text-center text-uppercase text-secondary  opacity-7">discount</th>
                       <th class="text-center text-uppercase text-secondary  opacity-7">Start</th>
                       <th class="text-center text-uppercase text-secondary  opacity-7">End</th>
                     </tr>
@@ -189,6 +218,12 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </td>
                         <td>
                           <p class="text-center text-md font-weight-bold mb-0"><?= $row["type"] ?></p>
+                        </td>
+                        <td class="text-center w-10 py-3">
+                          <p class="text-md font-weight-bold mb-0"><?= $row["discount_type"] ?></p>
+                        </td>
+                        <td class="text-center w-10 py-3">
+                          <p class="text-md font-weight-bold mb-0"><?= $row["discount"] ?></p>
                         </td>
                         <td class="align-middle text-center text-lg">
                           <span class="badge badge-sm bg-gradient-success"><?= $row["str_time"] ?></span>
@@ -208,13 +243,29 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     </main>
   </div>
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
+    const myModal = document.getElementById('exampleModal')
+
+    myModal.addEventListener('shown.bs.modal', () => {})
+
     function sendData() {
       let selectElement = document.getElementById("discount_select");
       let selectedValue = selectElement.value;
       document.getElementById("discount_type").value = selectedValue;
+    }
 
+    function updateDiscountType() {
+      sendData();
+      const discountValueInput = document.getElementById('discount_type');
+      const discountTextValueInput = document.getElementById('discount_text');
+      if (discountValueInput.value === '折扣折數') {
+        discountTextValueInput.value = '%';
+      }else if (discountValueInput.value === '免運費') {
+        discountTextValueInput.value = '100%';
+      } else {
+        discountTextValueInput.value = '';
+      }
     }
 
     function updateField(id) {
@@ -230,37 +281,43 @@ $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
           console.log(response);
           return response.json();
         })
-        .then(data => {
-          console.log(data);
-          if (data.error) {
-            alert('更新失敗: ' + data.error);
-            return;
+        .then(date => {
+          if (data.status === 0) {
+            data.errors.forEach(error => {
+              alert(`請輸入${error.message}`); //顯示錯誤訊息
+            });
           }
-          console.log('更新成功');
-          document.querySelector("input[name=name]").value = data.updatedValue;
-
         })
-      // .catch(error => {
-      //   console.error('Error:', error);
-      //   alert('發生錯誤！請檢查網路連線或聯絡網站管理員。');
-      // });  更新成功依然跑失敗 需要解決
+        .then(data => {
+            console.log(data);
+            if (data.error) {
+              alert('更新失敗: ' + data.error);
+              return;
+            }
+            console.log('更新成功');
+            document.querySelector("input[name=name]").value = data.updatedValue;
+            })
+            // .catch(error => {
+            //   console.error('Error:', error);
+            //   alert('發生錯誤！請檢查網路連線或聯絡網站管理員。');
+            // });  
+            //更新成功依然跑失敗 需要解決
 
-    }
+          }
 
-    const btn = document.getElementById("button1");
-    const btn2 = document.getElementById("button2");
+          const btn1 = document.getElementById("button1");
+          const btn2 = document.getElementById("button2");
 
 
-    btn.addEventListener("click", function(e) {
-      e.preventDefault();
-      const id = document.querySelector("input[name=id]").value;
-      const discount_type = document.querySelector("input[name=discount_type]").value;
-      const discount = document.querySelector("input[name=discount]").value;
-      const str_time = document.querySelector("input[name=str-time]").value;
-      const end_time = document.querySelector("input[name=end-time]").value;
-      updateField(id);
-
-    })
+          btn1.addEventListener("click", function(e) {
+            e.preventDefault();
+            const id = document.querySelector("input[name=id]").value;
+            const discount_type = document.querySelector("input[name=discount_type]").value;
+            const discount = document.querySelector("input[name=discount]").value;
+            const str_time = document.querySelector("input[name=str-time]").value;
+            const end_time = document.querySelector("input[name=end-time]").value;
+            updateField(id);
+          })
   </script>
 </body>
 

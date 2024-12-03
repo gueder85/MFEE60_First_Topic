@@ -1,5 +1,5 @@
 <?php
-require_once("../db_connect.php");
+require_once("../../db_connect.php");
 
 $id=$_GET["id"];
 $sql="UPDATE coupons SET is_deleted = 1 WHERE id=$id"; 
