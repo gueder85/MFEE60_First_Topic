@@ -1,3 +1,5 @@
+請依照下列步驟服用
+
 1. 在C槽XAMPP/htdocs新增資料夾"任意命名"
 2. VScode打開資料夾開終端機輸入 git clone https://github.com/gueder85/MFEE60_First_Topic.git . <<< 要加這個點才會在對的層
 3. clone下來後啟動XAMPP開啟Apache跟MySQL
